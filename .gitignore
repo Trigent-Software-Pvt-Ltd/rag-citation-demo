@@ -33,6 +33,18 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# credentials
+master_credentials.env
+
+# inspiration folder (local reference only)
+/inspiration
+
+# backup env
+.env.local.backup
+
+# papers folder (large PDFs - loaded into DB separately)
+/papers
+
 # vercel
 .vercel
 
