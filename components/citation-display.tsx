@@ -1,25 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-
-interface Citation {
-  chunk_id: number;
-  sentences_range: string;
-  answer_snippet: string;
-  answer_snippet_start: number;
-  answer_snippet_end: number;
-  chunk_sentences_text: string;
-  chunk_sentences_start: number;
-  chunk_sentences_end: number;
-  document_name: string;
-  chunk_index: number;
-}
-
-interface CitationBlock {
-  type: "text";
-  text: string;
-  citations: Citation[];
-}
+import type { Citation, CitationBlock } from "@/lib/types";
 
 interface PopoverState {
   citation: Citation;

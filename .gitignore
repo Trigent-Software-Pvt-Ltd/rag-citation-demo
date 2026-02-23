@@ -48,6 +48,14 @@ master_credentials.env
 # vercel
 .vercel
 
+# playwright
+.playwright-mcp/
+
+# screenshots
+step*.png
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

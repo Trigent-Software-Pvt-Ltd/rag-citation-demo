@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-interface Chunk {
-  id: string;
-  document_name: string;
-  chunk_index: number;
-  similarity: number;
-  content: string;
-}
+import type { Chunk } from "@/lib/types";
 
 export default function ChunksPanel({ chunks }: { chunks: Chunk[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
