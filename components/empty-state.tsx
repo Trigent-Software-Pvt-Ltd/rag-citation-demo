@@ -18,7 +18,19 @@ export function NoDocumentSelected() {
   );
 }
 
-export function EmptyChat({ documentName }: { documentName: string }) {
+export function EmptyChat({
+  documentName,
+  onSuggestionClick,
+}: {
+  documentName: string;
+  onSuggestionClick?: (query: string) => void;
+}) {
+  const suggestions = [
+    "What is the main contribution of this paper?",
+    "What methodology or approach was used?",
+    "What are the key findings and results?",
+  ];
+
   return (
     <div className="flex flex-col items-center justify-center h-full max-w-md mx-auto text-center px-6">
       <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-slate-100 flex items-center justify-center mb-5">
@@ -29,13 +41,24 @@ export function EmptyChat({ documentName }: { documentName: string }) {
       <h2 className="text-base font-semibold text-slate-700 mb-2">
         Chat with &ldquo;{documentName}&rdquo;
       </h2>
-      <p className="text-sm text-slate-500 leading-relaxed mb-4">
+      <p className="text-sm text-slate-500 leading-relaxed mb-5">
         Ask a question below. Answers include{" "}
         <span className="underline decoration-dotted decoration-blue-500 decoration-2 underline-offset-2">
           inline citations
         </span>{" "}
         — hover or click to see the exact source text.
       </p>
+      <div className="flex flex-col gap-2 w-full">
+        {suggestions.map((s) => (
+          <button
+            key={s}
+            onClick={() => onSuggestionClick?.(s)}
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all duration-150 text-left"
+          >
+            {s}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

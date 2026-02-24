@@ -56,6 +56,12 @@ body {
   animation: typing-bounce 1.2s infinite ease-in-out;
 }
 
+/* Citation spans - subtle hover glow */
+.citation-span:hover {
+  filter: brightness(0.98);
+  text-decoration-style: solid !important;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;

@@ -121,7 +121,7 @@ export default function CitationDisplay({ block }: { block: CitationBlock }) {
 
   return (
     <div className="relative" ref={containerRef}>
-      <div className="text-[15px] leading-7 text-zinc-800">
+      <div className="text-[15px] leading-7 text-slate-800">
         {segments.map((seg, i) => {
           if (seg.type === "text") {
             return <span key={i}>{seg.content}</span>;
@@ -136,16 +136,17 @@ export default function CitationDisplay({ block }: { block: CitationBlock }) {
           return (
             <span
               key={i}
-              className="cursor-pointer transition-all duration-150"
+              className="cursor-pointer transition-all duration-150 citation-span"
               style={{
                 textDecorationLine: "underline",
                 textDecorationStyle: "dotted",
                 textDecorationColor: color,
-                textDecorationThickness: "2px",
+                textDecorationThickness: "2.5px",
                 textUnderlineOffset: "3px",
-                backgroundColor: isActive ? `${color}15` : "transparent",
-                borderRadius: "2px",
-                padding: "0 1px",
+                backgroundColor: isActive ? `${color}20` : `${color}08`,
+                borderRadius: "3px",
+                padding: "1px 2px",
+                borderBottom: isActive ? `2px solid ${color}` : undefined,
               }}
               onMouseEnter={(e) => handleMouseEnter(cit, e)}
               onMouseLeave={handleMouseLeave}
@@ -153,7 +154,7 @@ export default function CitationDisplay({ block }: { block: CitationBlock }) {
             >
               {cit.answer_snippet}
               <sup
-                className="ml-0.5 text-[10px] font-semibold"
+                className="ml-0.5 text-[10px] font-bold"
                 style={{ color }}
               >
                 [{cit.chunk_id + 1}]
@@ -167,7 +168,7 @@ export default function CitationDisplay({ block }: { block: CitationBlock }) {
       {popover && (
         <div
           ref={popoverRef}
-          className="fixed z-50 w-[420px] max-h-[320px] overflow-y-auto rounded-lg border border-zinc-200 bg-white p-4 shadow-lg"
+          className="fixed z-50 w-[420px] max-h-[320px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/50"
           style={{
             left: Math.min(
               popover.x - 210,
@@ -191,7 +192,7 @@ export default function CitationDisplay({ block }: { block: CitationBlock }) {
                   setPinned(false);
                   setPopover(null);
                 }}
-                className="text-zinc-400 hover:text-zinc-600 text-xs"
+                className="text-slate-400 hover:text-slate-600 text-xs"
               >
                 Close
               </button>
@@ -199,32 +200,32 @@ export default function CitationDisplay({ block }: { block: CitationBlock }) {
           </div>
 
           <div className="mb-2">
-            <p className="text-xs font-medium text-zinc-500 mb-0.5">
+            <p className="text-xs font-medium text-slate-500 mb-0.5">
               Document
             </p>
-            <p className="text-sm text-zinc-800 font-medium truncate">
+            <p className="text-sm text-slate-800 font-medium truncate">
               {popover.citation.document_name}
             </p>
           </div>
 
           <div className="mb-2">
-            <p className="text-xs font-medium text-zinc-500 mb-0.5">
+            <p className="text-xs font-medium text-slate-500 mb-0.5">
               Chunk #{popover.citation.chunk_index + 1} &middot; Sentences{" "}
               {popover.citation.sentences_range}
             </p>
           </div>
 
-          <div className="rounded-md bg-zinc-50 border border-zinc-100 p-3">
-            <p className="text-xs font-medium text-zinc-500 mb-1">
+          <div className="rounded-md bg-slate-50 border border-slate-100 p-3">
+            <p className="text-xs font-medium text-slate-500 mb-1">
               Source Text
             </p>
-            <p className="text-sm text-zinc-700 leading-relaxed">
+            <p className="text-sm text-slate-700 leading-relaxed">
               &ldquo;{popover.citation.chunk_sentences_text}&rdquo;
             </p>
           </div>
 
           {popover.citation.chunk_sentences_start >= 0 && (
-            <p className="mt-2 text-[10px] text-zinc-400">
+            <p className="mt-2 text-[10px] text-slate-400">
               Characters {popover.citation.chunk_sentences_start}&ndash;
               {popover.citation.chunk_sentences_end} in chunk
             </p>

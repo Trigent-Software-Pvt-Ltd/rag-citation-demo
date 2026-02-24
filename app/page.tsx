@@ -9,12 +9,14 @@ import type { Document, Conversation, QueryResult, CitationBlock } from "@/lib/t
 
 export default function Home() {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [docsLoading, setDocsLoading] = useState(true);
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [liveResults, setLiveResults] = useState<QueryResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const shouldScrollRef = useRef(false);
 
   const selectedDocument = documents.find((d) => d.id === selectedDocumentId);
 
@@ -25,6 +27,8 @@ export default function Home() {
       if (data.documents) setDocuments(data.documents);
     } catch {
       // silently handle
+    } finally {
+      setDocsLoading(false);
     }
   }, []);
 
@@ -48,18 +52,22 @@ export default function Home() {
     setSelectedDocumentId(docId);
     setLiveResults([]);
     setConversations([]);
+    shouldScrollRef.current = false;
     fetchConversations(docId);
   }
 
-  // Auto-scroll to bottom when new messages appear
+  // Auto-scroll to bottom only when new live messages appear or loading starts
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [conversations, liveResults, loading]);
+    if (shouldScrollRef.current) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [liveResults, loading]);
 
   async function handleQuery(query: string) {
     if (!selectedDocumentId || loading) return;
 
     setLoading(true);
+    shouldScrollRef.current = true;
 
     try {
       const res = await fetch("/api/query", {
@@ -119,6 +127,7 @@ export default function Home() {
       >
         <DocumentSidebar
           documents={documents}
+          loading={docsLoading}
           selectedId={selectedDocumentId}
           onSelect={handleSelectDocument}
           onRefresh={fetchDocuments}
@@ -166,7 +175,10 @@ export default function Home() {
           {!selectedDocumentId && <NoDocumentSelected />}
 
           {selectedDocumentId && !hasMessages && !loading && (
-            <EmptyChat documentName={selectedDocument?.name || ""} />
+            <EmptyChat
+              documentName={selectedDocument?.name || ""}
+              onSuggestionClick={handleQuery}
+            />
           )}
 
           {selectedDocumentId && hasMessages && (
