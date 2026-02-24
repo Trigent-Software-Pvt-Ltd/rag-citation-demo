@@ -62,6 +62,68 @@ body {
   text-decoration-style: solid !important;
 }
 
+/* PDF viewer panel slide-in */
+.pdf-viewer-panel {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* PDF page rendering */
+.pdf-page-container {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+/* PDF text layer highlight styles */
+.react-pdf__Page__textContent span.pdf-highlight {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.6) !important;
+  border-radius: 1px;
+}
+
+.react-pdf__Page__textContent span.pdf-highlight-active {
+  background-color: rgba(59, 130, 246, 0.18) !important;
+  border-bottom: 3px solid rgba(59, 130, 246, 0.9) !important;
+  animation: highlight-flash 2s ease-out 1;
+}
+
+/* First span gets a left accent bar */
+.react-pdf__Page__textContent span.pdf-highlight-start {
+  border-left: 3.5px solid rgba(59, 130, 246, 0.95) !important;
+  padding-left: 2px !important;
+}
+
+@keyframes highlight-flash {
+  0% {
+    background-color: rgba(59, 130, 246, 0.5) !important;
+    box-shadow: 0 0 16px 6px rgba(59, 130, 246, 0.4);
+  }
+  25% {
+    background-color: rgba(59, 130, 246, 0.35) !important;
+    box-shadow: 0 0 10px 3px rgba(59, 130, 246, 0.25);
+  }
+  100% {
+    background-color: rgba(59, 130, 246, 0.18) !important;
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* View in PDF button hover effect */
+.view-in-pdf-btn:hover svg {
+  transform: scale(1.1);
+  transition: transform 0.15s ease;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;

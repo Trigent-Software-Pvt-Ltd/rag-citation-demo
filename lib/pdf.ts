@@ -10,6 +10,52 @@ export async function extractTextFromPDF(
 }
 
 /**
+ * Extract text from each page of a PDF individually.
+ * Returns an array of strings, one per page (0-indexed).
+ */
+export async function extractPageTexts(
+  buffer: Buffer
+): Promise<string[]> {
+  const pageTexts: string[] = [];
+
+  await pdfParse(buffer, {
+    pagerender: (pageData: {
+      pageIndex: number;
+      getTextContent: (opts: {
+        normalizeWhitespace: boolean;
+        disableCombineTextItems: boolean;
+      }) => Promise<{
+        items: Array<{ str: string; transform: number[] }>;
+      }>;
+    }) => {
+      return pageData
+        .getTextContent({
+          normalizeWhitespace: false,
+          disableCombineTextItems: false,
+        })
+        .then((textContent) => {
+          let lastY: number | undefined;
+          let text = "";
+          for (const item of textContent.items) {
+            if (lastY === item.transform[5] || lastY === undefined) {
+              text += item.str;
+            } else {
+              text += "\n" + item.str;
+            }
+            lastY = item.transform[5];
+          }
+          // pageData.pageIndex is 0-based
+          // Remove null bytes that can break JSONB storage
+          pageTexts[pageData.pageIndex] = text.replace(/\u0000/g, "");
+          return text;
+        });
+    },
+  });
+
+  return pageTexts;
+}
+
+/**
  * Split text into chunks with overlap for better context preservation.
  * Tries to split on paragraph/sentence boundaries.
  */

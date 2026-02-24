@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabase";
-import { extractTextFromPDF, chunkText } from "@/lib/pdf";
+import { extractTextFromPDF, extractPageTexts, chunkText } from "@/lib/pdf";
 import { generateEmbeddings } from "@/lib/embeddings";
 
 export async function POST(req: NextRequest) {
@@ -58,7 +58,10 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Extract text and chunk
-    const text = await extractTextFromPDF(buffer);
+    const [text, pageTexts] = await Promise.all([
+      extractTextFromPDF(buffer),
+      extractPageTexts(buffer),
+    ]);
     const chunks = chunkText(text);
 
     // 4. Generate embeddings for all chunks
@@ -83,10 +86,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 6. Update document status
+    // 6. Update document status and store page texts
     await supabase
       .from("rag_documents")
-      .update({ status: "ready", chunk_count: chunks.length })
+      .update({
+        status: "ready",
+        chunk_count: chunks.length,
+        page_texts: pageTexts,
+      })
       .eq("id", doc.id);
 
     return NextResponse.json({

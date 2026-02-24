@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS rag_documents (
   file_path TEXT,
   file_size INTEGER,
   chunk_count INTEGER DEFAULT 0,
+  page_texts JSONB DEFAULT NULL,
   status TEXT DEFAULT 'processing',
   created_at TIMESTAMPTZ DEFAULT now()
 );

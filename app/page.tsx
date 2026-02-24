@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import DocumentSidebar from "@/components/document-sidebar";
 import ChatMessage from "@/components/chat-message";
 import ChatInput from "@/components/chat-input";
 import { NoDocumentSelected, EmptyChat } from "@/components/empty-state";
-import type { Document, Conversation, QueryResult, CitationBlock } from "@/lib/types";
+import type { Document, Citation, Conversation, QueryResult, CitationBlock } from "@/lib/types";
+
+const PdfViewer = lazy(() => import("@/components/pdf-viewer"));
 
 export default function Home() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -17,6 +19,10 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const shouldScrollRef = useRef(false);
+
+  // PDF viewer state
+  const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
+  const [pdfCitations, setPdfCitations] = useState<Citation[]>([]);
 
   const selectedDocument = documents.find((d) => d.id === selectedDocumentId);
 
@@ -53,6 +59,8 @@ export default function Home() {
     setLiveResults([]);
     setConversations([]);
     shouldScrollRef.current = false;
+    setPdfViewerOpen(false);
+    setPdfCitations([]);
     fetchConversations(docId);
   }
 
@@ -115,6 +123,17 @@ export default function Home() {
     }
   }
 
+  function handleViewInPdf(citations: Citation[]) {
+    if (!selectedDocumentId) return;
+    setPdfCitations(citations);
+    setPdfViewerOpen(true);
+  }
+
+  function handleClosePdfViewer() {
+    setPdfViewerOpen(false);
+    setPdfCitations([]);
+  }
+
   const hasMessages = conversations.length > 0 || liveResults.length > 0;
 
   return (
@@ -134,8 +153,10 @@ export default function Home() {
         />
       </div>
 
-      {/* Main content */}
-      <div className="flex flex-1 flex-col min-w-0">
+      {/* Main content - chat area */}
+      <div className={`flex flex-col min-w-0 transition-all duration-300 ${
+        pdfViewerOpen ? "w-1/2" : "flex-1"
+      }`}>
         {/* Header */}
         <header className="chat-header flex items-center gap-3 border-b border-slate-200 px-6 py-3">
           <button
@@ -191,6 +212,7 @@ export default function Home() {
                   result={{ type: "text", text: conv.answer, citations: conv.citations || [] } as CitationBlock}
                   chunks={conv.chunks_used || []}
                   isHistorical={true}
+                  onViewInPdf={handleViewInPdf}
                 />
               ))}
 
@@ -201,6 +223,7 @@ export default function Home() {
                   query={r.query}
                   result={r.result}
                   chunks={r.chunks}
+                  onViewInPdf={handleViewInPdf}
                 />
               ))}
 
@@ -234,6 +257,31 @@ export default function Home() {
           />
         </div>
       </div>
+
+      {/* PDF Viewer panel */}
+      {pdfViewerOpen && selectedDocumentId && (
+        <div className="w-1/2 flex-shrink-0 pdf-viewer-panel">
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-full bg-slate-100 border-l border-slate-200">
+                <div className="flex items-center gap-2 text-slate-400 text-sm">
+                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Loading PDF viewer...
+                </div>
+              </div>
+            }
+          >
+            <PdfViewer
+              documentId={selectedDocumentId}
+              citations={pdfCitations}
+              onClose={handleClosePdfViewer}
+            />
+          </Suspense>
+        </div>
+      )}
     </div>
   );
 }
